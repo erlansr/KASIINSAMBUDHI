@@ -2,17 +2,60 @@
 import { Document, Page, Text, View, StyleSheet } from '@react-pdf/renderer'
 
 const styles = StyleSheet.create({
-  page: { padding: 30, fontSize: 10 },
-  header: { marginBottom: 20, textAlign: 'center' },
-  title: { fontSize: 18, fontWeight: 'bold', marginBottom: 5 },
-  subtitle: { fontSize: 12, color: '#666', marginBottom: 10 },
-  table: { display: 'table', width: 'auto', marginTop: 10 },
-  tableRow: { flexDirection: 'row', borderBottomWidth: 1, borderBottomColor: '#ddd', paddingVertical: 5 },
-  tableHeader: { backgroundColor: '#f0f0f0', fontWeight: 'bold' },
-  tableCell: { flex: 1, paddingHorizontal: 5 },
-  summary: { marginTop: 20, padding: 10, backgroundColor: '#f5f5f5' },
-  summaryRow: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 5 },
-  footer: { marginTop: 30, textAlign: 'center', color: '#999', fontSize: 8 }
+  page: { 
+    padding: 30, 
+    fontSize: 10,
+    fontFamily: 'Helvetica'
+  },
+  header: { 
+    marginBottom: 20, 
+    textAlign: 'center' 
+  },
+  title: { 
+    fontSize: 18, 
+    fontWeight: 'bold', 
+    marginBottom: 5 
+  },
+  subtitle: { 
+    fontSize: 12, 
+    color: '#666', 
+    marginBottom: 10 
+  },
+  // Ganti 'table' dengan 'flex'
+  table: { 
+    marginTop: 10,
+    width: '100%'
+  },
+  tableRow: { 
+    flexDirection: 'row', 
+    borderBottomWidth: 1, 
+    borderBottomColor: '#ddd', 
+    paddingVertical: 5 
+  },
+  tableHeader: { 
+    backgroundColor: '#f0f0f0', 
+    fontWeight: 'bold' 
+  },
+  tableCell: { 
+    flex: 1, 
+    paddingHorizontal: 5 
+  },
+  summary: { 
+    marginTop: 20, 
+    padding: 10, 
+    backgroundColor: '#f5f5f5' 
+  },
+  summaryRow: { 
+    flexDirection: 'row', 
+    justifyContent: 'space-between', 
+    marginBottom: 5 
+  },
+  footer: { 
+    marginTop: 30, 
+    textAlign: 'center', 
+    color: '#999', 
+    fontSize: 8 
+  }
 })
 
 interface LaporanPDFProps {
@@ -56,28 +99,27 @@ export default function LaporanPDF({ data, summary, bulan, tahun, status }: Lapo
           </View>
         </View>
 
-        {/* Table */}
-        <View style={styles.table}>
-          <View style={[styles.tableRow, styles.tableHeader]}>
-            <Text style={styles.tableCell}>No</Text>
-            <Text style={[styles.tableCell, { flex: 2 }]}>Keluarga</Text>
-            <Text style={styles.tableCell}>Bulan</Text>
-            <Text style={styles.tableCell}>Nominal</Text>
-            <Text style={styles.tableCell}>Status</Text>
-          </View>
-          
-          {data.map((item, index) => (
-            <View key={item.id} style={styles.tableRow}>
-              <Text style={styles.tableCell}>{index + 1}</Text>
-              <Text style={[styles.tableCell, { flex: 2 }]}>{item.keluarga?.namaKeluarga}</Text>
-              <Text style={styles.tableCell}>{item.bulan}</Text>
-              <Text style={styles.tableCell}>Rp {item.nominal.toLocaleString('id-ID')}</Text>
-              <Text style={styles.tableCell}>
-                {item.status === 'lunas' ? 'LUNAS' : 'BELUM LUNAS'}
-              </Text>
-            </View>
-          ))}
+        {/* Table Header */}
+        <View style={[styles.tableRow, styles.tableHeader]}>
+          <Text style={styles.tableCell}>No</Text>
+          <Text style={[styles.tableCell, { flex: 2 }]}>Keluarga</Text>
+          <Text style={styles.tableCell}>Bulan</Text>
+          <Text style={styles.tableCell}>Nominal</Text>
+          <Text style={styles.tableCell}>Status</Text>
         </View>
+        
+        {/* Table Body */}
+        {data.map((item, index) => (
+          <View key={item.id} style={styles.tableRow}>
+            <Text style={styles.tableCell}>{index + 1}</Text>
+            <Text style={[styles.tableCell, { flex: 2 }]}>{item.keluarga?.namaKeluarga}</Text>
+            <Text style={styles.tableCell}>{item.bulan}</Text>
+            <Text style={styles.tableCell}>Rp {item.nominal.toLocaleString('id-ID')}</Text>
+            <Text style={styles.tableCell}>
+              {item.status === 'lunas' ? 'LUNAS' : 'BELUM LUNAS'}
+            </Text>
+          </View>
+        ))}
 
         {/* Footer */}
         <View style={styles.footer}>
