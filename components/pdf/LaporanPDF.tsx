@@ -21,7 +21,6 @@ const styles = StyleSheet.create({
     color: '#666', 
     marginBottom: 10 
   },
-  // Ganti 'table' dengan 'flex'
   table: { 
     marginTop: 10,
     width: '100%'
