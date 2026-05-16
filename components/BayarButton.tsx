@@ -9,7 +9,6 @@ function GlobalSuccessPopup({ onClose }: { onClose: () => void }) {
       onClose()
       window.location.reload()
     }, 2000)
-
     return () => clearTimeout(timer)
   }, [onClose])
 
@@ -36,11 +35,11 @@ interface BayarButtonProps {
   onSuccess?: () => void
 }
 
-// Flag untuk mengecek apakah Snap.js sudah di-load
 let snapLoaded = false
 
 export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarButtonProps) {
   const [loading, setLoading] = useState(false)
+  const [showSuccessPopup, setShowSuccessPopup] = useState(false)
 
   const updateStatusLunas = async (ids: number | number[]) => {
     try {
@@ -59,10 +58,9 @@ export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarB
     }
   }
 
-  // Load Snap.js sekali saat komponen mount
+  // Load Snap.js once
   useEffect(() => {
     if (!snapLoaded && typeof window !== 'undefined') {
-      // Cek apakah sudah ada script Snap.js
       const existingScript = document.querySelector('script[src*="midtrans.com/snap/snap.js"]')
       
       if (!existingScript) {
@@ -103,27 +101,31 @@ export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarB
       const data = await res.json()
 
       if (data.success) {
-        // Tunggu sebentar hingga Snap.js siap
-        const waitForSnap = (retries = 10) => {
+        const waitForSnap = (retries = 15) => {
           // @ts-ignore
           if (window.snap) {
             // @ts-ignore
             window.snap.pay(data.token, {
               onSuccess: async () => {
                 await updateStatusLunas(id)
-                if (onSuccess) onSuccess()
                 setLoading(false)
+                setShowSuccessPopup(true)
+                if (onSuccess) onSuccess()
               },
               onError: (result: any) => {
                 alert('❌ Pembayaran gagal: ' + result.status_message)
-                setLoading(false)
+                window.location.reload() // Refresh kalau error
+              },
+              onClose: () => {
+                // User klik silang (X), refresh halaman
+                window.location.reload()
               }
             })
           } else if (retries > 0) {
-            setTimeout(() => waitForSnap(retries - 1), 200)
+            setTimeout(() => waitForSnap(retries - 1), 300)
           } else {
             alert('❌ Gagal memuat pembayaran. Silakan refresh halaman.')
-            setLoading(false)
+            window.location.reload()
           }
         }
         
@@ -133,7 +135,7 @@ export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarB
         setLoading(false)
       }
     } catch (error) {
-      alert('Gagal koneksi ke server')
+      alert('❌ Gagal koneksi ke server')
       setLoading(false)
     }
   }
@@ -147,24 +149,42 @@ export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarB
   }
 
   return (
-    <button
-      onClick={handleBayar}
-      disabled={loading}
-      className="bayar-btn"
-    >
-      {loading ? (
-        <>
-          <span className="bayar-btn-spinner" />
-          Memproses…
-        </>
-      ) : (
-        <>
-          {getButtonText()}
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </>
+    <>
+      <button
+        onClick={handleBayar}
+        disabled={loading}
+        className="bayar-btn"
+      >
+        {loading ? (
+          <>
+            <span className="bayar-btn-spinner" />
+            Memproses…
+          </>
+        ) : (
+          <>
+            {getButtonText()}
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6"/>
+            </svg>
+          </>
+        )}
+      </button>
+
+      {/* Loading Overlay */}
+      {loading && (
+        <div className="loading-overlay">
+          <div className="loading-card">
+            <div className="loading-spinner"></div>
+            <p className="loading-message">⏳ Menyiapkan pembayaran...</p>
+            <p className="loading-hint">Mohon tunggu, jangan tutup halaman ini</p>
+          </div>
+        </div>
       )}
-    </button>
+
+      {/* Success Popup */}
+      {showSuccessPopup && (
+        <GlobalSuccessPopup onClose={() => setShowSuccessPopup(false)} />
+      )}
+    </>
   )
 }
