@@ -1,26 +1,461 @@
-@import "tailwindcss";
+/* app/globals.css */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
+/* ─── Design Tokens ──────────────────────────────────────────── */
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+    --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+
+    --color-black: #000000;
+    --color-white: #ffffff;
+    --color-gray-50: #fafafa;
+    --color-gray-100: #f5f5f5;
+    --color-gray-200: #e5e5e5;
+    --color-gray-300: #d4d4d4;
+    --color-gray-400: #a3a3a3;
+    --color-gray-500: #737373;
+    --color-gray-600: #525252;
+    --color-gray-700: #404040;
+    --color-gray-800: #262626;
+    --color-gray-900: #171717;
+
+    --surface-bg: var(--color-white);
+    --surface-border: var(--color-gray-200);
+    --text-primary: var(--color-black);
+    --text-muted: var(--color-gray-400);
+
+    --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+    --duration-base: 250ms;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
-}
-
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+/* ─── Base ───────────────────────────────────────────────────── */
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
 }
 
 body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+    font-family: var(--font-sans);
+    background: var(--surface-bg);
+    color: var(--text-primary);
+    -webkit-font-smoothing: antialiased;
+    min-height: 100vh;
+}
+
+/* ─── Navbar ─────────────────────────────────────────────────── */
+.nav-root {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: rgba(255, 255, 255, 0.95);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.nav-inner {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.nav-brand {
+    display: flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    text-decoration: none;
+}
+
+.nav-brand-text {
+    font-size: 1.125rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    color: var(--color-black);
+}
+
+.nav-brand-sub {
+    font-size: 0.625rem;
+    font-weight: 500;
+    letter-spacing: 0.2em;
+    color: var(--text-muted);
+}
+
+.nav-admin-btn {
+    padding: 0.5rem 1rem;
+    background: var(--color-black);
+    color: var(--color-white);
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-decoration: none;
+    border-radius: 6px;
+    transition: opacity var(--duration-base);
+}
+
+.nav-admin-btn:hover {
+    opacity: 0.8;
+}
+
+/* ─── Main Content ───────────────────────────────────────────── */
+.main-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1.5rem 5rem;
+    min-height: calc(100vh - 120px);
+}
+
+/* ─── Footer ─────────────────────────────────────────────────── */
+.site-footer {
+    border-top: 1px solid var(--surface-border);
+    padding: 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+/* ─── Cards Grid (Home) ─────────────────────────────────────── */
+.keluarga-card {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1.5rem;
+    background: var(--color-white);
+    border: 1px solid var(--surface-border);
+    padding: 1.25rem 1.5rem;
+    text-decoration: none;
+    transition: all 0.2s ease;
+}
+
+.keluarga-card:hover {
+    border-color: var(--color-black);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    transform: translateY(-1px);
+}
+
+.card-body {
+    flex: 1;
+}
+
+.card-number {
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--color-gray-400);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+}
+
+.card-name {
+    font-size: 1.125rem;
+    font-weight: 700;
+    margin: 0.25rem 0 0.5rem;
+    color: var(--color-black);
+}
+
+.card-detail-row {
+    display: flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.75rem;
+    color: var(--color-gray-500);
+    margin-top: 0.25rem;
+}
+
+.card-detail-row svg {
+    width: 12px;
+    height: 12px;
+}
+
+.card-action-btn {
+    padding: 0.5rem 1rem;
+    background: var(--color-black);
+    color: white;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border-radius: 6px;
+    white-space: nowrap;
+}
+
+/* ─── Tagihan Page ──────────────────────────────────────────── */
+.tagihan-back-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    text-decoration: none;
+    margin-bottom: 1.5rem;
+}
+
+.tagihan-header {
+    margin-bottom: 2rem;
+}
+
+.tagihan-eyebrow {
+    font-size: 0.7rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-gray-400);
+}
+
+.tagihan-title {
+    font-size: 2rem;
+    font-weight: 800;
+    letter-spacing: -0.02em;
+    margin: 0.25rem 0 0.5rem;
+}
+
+.tagihan-meta-row {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+    margin-top: 0.5rem;
+}
+
+.tagihan-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    font-size: 0.8125rem;
+    color: var(--color-gray-500);
+}
+
+.tagihan-count-strip {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-top: 1px solid var(--surface-border);
+    border-bottom: 1px solid var(--surface-border);
+    margin-bottom: 1rem;
+}
+
+.tagihan-count-badge {
+    background: var(--color-black);
+    color: white;
+    padding: 0.125rem 0.5rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+}
+
+.tagihan-list {
+    display: flex;
+    flex-direction: column;
+}
+
+.tagihan-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1rem 0;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.tagihan-item-bulan {
+    font-weight: 700;
+}
+
+.tagihan-item-nominal {
+    font-size: 0.875rem;
+    color: var(--color-gray-500);
+    margin-top: 0.125rem;
+}
+
+/* Tambahkan ini ke globals.css di bagian Tagihan Page */
+
+/* ─── Bulk Action Bar ───────────────────────────────────────── */
+.tagihan-bulk-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem 0;
+    margin-bottom: 0.5rem;
+    border-bottom: 1px solid var(--surface-border);
+}
+
+.tagihan-checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: 0.8125rem;
+    font-weight: 500;
+    color: var(--color-gray-600);
+    cursor: pointer;
+}
+
+.tagihan-checkbox {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--color-black);
+}
+
+.tagihan-item-left {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    flex: 1;
+}
+
+.tagihan-item-checkbox {
+    width: 16px;
+    height: 16px;
+    margin: 0;
+    cursor: pointer;
+    accent-color: var(--color-black);
+}
+
+.tagihan-count-selected {
+    font-size: 0.7rem;
+    font-weight: 500;
+    color: var(--color-gray-500);
+    background: var(--color-gray-100);
+    padding: 0.25rem 0.75rem;
+}
+
+/* ─── Bayar Button ──────────────────────────────────────────── */
+.bayar-btn {
+    padding: 0.5rem 1.25rem;
+    background: var(--color-black);
+    color: white;
+    border: none;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 6px;
+    transition: opacity 0.2s;
+}
+
+.bayar-btn:hover:not(:disabled) {
+    opacity: 0.8;
+}
+
+.bayar-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* ─── Empty / Loading States ────────────────────────────────── */
+.tagihan-empty-state,
+.tagihan-lunas-state {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.tagihan-loading {
+    text-align: center;
+    padding: 4rem 1rem;
+}
+
+.tagihan-loading-spinner {
+    width: 24px;
+    height: 24px;
+    border: 2px solid var(--color-gray-200);
+    border-top-color: var(--color-black);
+    border-radius: 50%;
+    animation: spin 0.6s linear infinite;
+    margin: 0 auto 1rem;
+}
+
+@keyframes spin {
+    to {
+        transform: rotate(360deg);
+    }
+}
+
+.tagihan-back-btn {
+    display: inline-block;
+    padding: 0.625rem 1.25rem;
+    background: var(--color-black);
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    margin-top: 1rem;
+}
+
+/* ─── Responsive ────────────────────────────────────────────── */
+@media (max-width: 640px) {
+    .nav-brand-sub {
+        display: none;
+    }
+
+    .keluarga-card {
+        flex-direction: column;
+        text-align: center;
+    }
+
+    .tagihan-item {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .site-footer {
+        flex-direction: column;
+        text-align: center;
+        gap: 0.5rem;
+    }
+
+    /* Global Popup di Tengah Layar */
+    .global-popup-overlay {
+        position: fixed;
+        top: 0;
+        left: 0;
+        right: 0;
+        bottom: 0;
+        background-color: rgba(0, 0, 0, 0.5);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+    }
+
+    .global-popup-container {
+        background-color: white;
+        border-radius: 20px;
+        padding: 32px 48px;
+        min-width: 320px;
+        text-align: center;
+        box-shadow: 0 25px 40px -12px rgba(0, 0, 0, 0.25);
+        animation: popupSlideIn 0.3s ease;
+    }
+
+    .global-popup-icon {
+        margin-bottom: 20px;
+    }
+
+    .global-popup-title {
+        font-size: 22px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        color: #16a34a;
+    }
+
+    .global-popup-message {
+        font-size: 14px;
+        color: #6b7280;
+    }
+
+    @keyframes popupSlideIn {
+        from {
+            opacity: 0;
+            transform: translateY(-20px);
+        }
+
+        to {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    }
 }
