@@ -1,23 +1,41 @@
 // app/page.tsx
-import { PrismaClient } from '@prisma/client'
+'use client'
+
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 
-const prisma = new PrismaClient()
+export default function HomePage() {
+  const [keluargaList, setKeluargaList] = useState([])
+  const [loading, setLoading] = useState(true)
 
-async function getKeluarga() {
-  try {
-    const keluarga = await prisma.keluarga.findMany({
-      orderBy: { namaKeluarga: 'asc' }
-    })
-    return keluarga
-  } catch (error) {
-    console.error(error)
-    return []
+  const fetchKeluarga = async () => {
+    try {
+      const res = await fetch('/api/keluarga')
+      const data = await res.json()
+      if (data.success) {
+        setKeluargaList(data.data)
+      }
+    } catch (error) {
+      console.error('Fetch error:', error)
+    } finally {
+      setLoading(false)
+    }
   }
-}
 
-export default async function HomePage() {
-  const keluargaList = await getKeluarga()
+  useEffect(() => {
+    fetchKeluarga()
+  }, [])
+
+  if (loading) {
+    return (
+      <div style={{ minHeight: '100vh', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+        <div style={{ textAlign: 'center' }}>
+          <div style={{ width: '32px', height: '32px', border: '2px solid #e5e5e5', borderTopColor: '#000', borderRadius: '50%', animation: 'spin 0.6s linear infinite', margin: '0 auto 1rem' }} />
+          <p style={{ color: '#a3a3a3' }}>Memuat data keluarga…</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div style={{ minHeight: '100%' }}>
@@ -142,6 +160,11 @@ export default async function HomePage() {
         )}
       </div>
 
+      <style>{`
+        @keyframes spin {
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   )
 }
@@ -151,52 +174,95 @@ function KeluargaCard({ keluarga, index }: { keluarga: any; index: number }) {
   return (
     <Link
       href={`/tagihan?id=${keluarga.id}`}
-      className="keluarga-card"
-      aria-label={`Buka tagihan keluarga ${keluarga.namaKeluarga}`}
+      style={{
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+        padding: '1rem 1.25rem',
+        backgroundColor: '#fff',
+        border: '1px solid #e5e5e5',
+        borderRadius: '1rem',
+        textDecoration: 'none',
+        transition: 'all 0.2s ease',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.borderColor = '#000'
+        e.currentTarget.style.transform = 'translateY(-2px)'
+        e.currentTarget.style.boxShadow = '0 8px 20px rgba(0,0,0,0.05)'
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.borderColor = '#e5e5e5'
+        e.currentTarget.style.transform = 'translateY(0)'
+        e.currentTarget.style.boxShadow = 'none'
+      }}
     >
       {/* Kiri: info keluarga */}
-      <div className="card-body">
-
+      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', flex: 1 }}>
         {/* Nomor urut */}
-        <span className="card-number">
+        <span style={{
+          display: 'inline-flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          width: '2rem',
+          height: '2rem',
+          background: '#f5f5f5',
+          color: '#737373',
+          fontSize: '0.75rem',
+          fontWeight: 600,
+          borderRadius: '0.75rem',
+          flexShrink: 0,
+        }}>
           {String(index + 1).padStart(2, '0')}
         </span>
 
-        {/* Nama */}
-        <div className="card-name">
-          {keluarga.namaKeluarga}
-        </div>
-
-        {/* Alamat & telepon */}
-        <div className="card-details">
-          {keluarga.alamat && (
-            <div className="card-detail-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
-                <circle cx="12" cy="9" r="2.5"/>
-              </svg>
-              <span>{keluarga.alamat}</span>
-            </div>
-          )}
-          {keluarga.noTelepon && (
-            <div className="card-detail-row">
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-                <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.47 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.88-.88a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
-              </svg>
-              <span>{keluarga.noTelepon}</span>
+        {/* Info */}
+        <div>
+          <div style={{
+            fontWeight: 600,
+            fontSize: '1rem',
+            color: '#171717',
+            marginBottom: '0.25rem',
+          }}>
+            {keluarga.namaKeluarga}
+          </div>
+          
+          {(keluarga.alamat || keluarga.noTelepon) && (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.125rem' }}>
+              {keluarga.alamat && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="2">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/>
+                    <circle cx="12" cy="9" r="2.5"/>
+                  </svg>
+                  <span style={{ fontSize: '0.75rem', color: '#a3a3a3' }}>{keluarga.alamat}</span>
+                </div>
+              )}
+              {keluarga.noTelepon && (
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.375rem' }}>
+                  <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#a3a3a3" strokeWidth="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.69 12 19.79 19.79 0 0 1 1.57 3.47 2 2 0 0 1 3.54 1h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 8.8a16 16 0 0 0 6.29 6.29l.88-.88a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                  <span style={{ fontSize: '0.75rem', color: '#a3a3a3' }}>{keluarga.noTelepon}</span>
+                </div>
+              )}
             </div>
           )}
         </div>
       </div>
 
       {/* Kanan: tombol buka */}
-      <div className="card-action">
-        <span className="card-action-btn">
-          Buka
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
-            <path d="M9 18l6-6-6-6"/>
-          </svg>
-        </span>
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        gap: '0.5rem',
+        color: '#000',
+        fontWeight: 500,
+        fontSize: '0.8125rem',
+      }}>
+        Buka
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+          <path d="M9 18l6-6-6-6"/>
+        </svg>
       </div>
     </Link>
   )
