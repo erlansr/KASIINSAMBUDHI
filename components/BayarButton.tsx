@@ -36,6 +36,9 @@ interface BayarButtonProps {
   onSuccess?: () => void
 }
 
+// Flag untuk mengecek apakah Snap.js sudah di-load
+let snapLoaded = false
+
 export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarButtonProps) {
   const [loading, setLoading] = useState(false)
 
@@ -55,6 +58,27 @@ export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarB
       return false
     }
   }
+
+  // Load Snap.js sekali saat komponen mount
+  useEffect(() => {
+    if (!snapLoaded && typeof window !== 'undefined') {
+      // Cek apakah sudah ada script Snap.js
+      const existingScript = document.querySelector('script[src*="midtrans.com/snap/snap.js"]')
+      
+      if (!existingScript) {
+        const snapScript = document.createElement('script')
+        snapScript.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
+        snapScript.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!)
+        snapScript.async = true
+        snapScript.onload = () => {
+          snapLoaded = true
+        }
+        document.body.appendChild(snapScript)
+      } else {
+        snapLoaded = true
+      }
+    }
+  }, [])
 
   const handleBayar = async () => {
     setLoading(true)
@@ -79,25 +103,31 @@ export default function BayarButton({ id, nominal, multiple, onSuccess }: BayarB
       const data = await res.json()
 
       if (data.success) {
-        const snapScript = document.createElement('script')
-        snapScript.src = 'https://app.sandbox.midtrans.com/snap/snap.js'
-        snapScript.setAttribute('data-client-key', process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY!)
-        
-        snapScript.onload = () => {
+        // Tunggu sebentar hingga Snap.js siap
+        const waitForSnap = (retries = 10) => {
           // @ts-ignore
-          window.snap.pay(data.token, {
-            onSuccess: async () => {
-              await updateStatusLunas(id)
-              if (onSuccess) onSuccess()
-              setLoading(false)
-            },
-            onError: (result: any) => {
-              alert('❌ Pembayaran gagal: ' + result.status_message)
-              setLoading(false)
-            }
-          })
+          if (window.snap) {
+            // @ts-ignore
+            window.snap.pay(data.token, {
+              onSuccess: async () => {
+                await updateStatusLunas(id)
+                if (onSuccess) onSuccess()
+                setLoading(false)
+              },
+              onError: (result: any) => {
+                alert('❌ Pembayaran gagal: ' + result.status_message)
+                setLoading(false)
+              }
+            })
+          } else if (retries > 0) {
+            setTimeout(() => waitForSnap(retries - 1), 200)
+          } else {
+            alert('❌ Gagal memuat pembayaran. Silakan refresh halaman.')
+            setLoading(false)
+          }
         }
-        document.body.appendChild(snapScript)
+        
+        waitForSnap()
       } else {
         alert('Error: ' + (data.error || 'Gagal memproses'))
         setLoading(false)

@@ -2,6 +2,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Toaster } from 'sonner'
+import Script from 'next/script'
 
 export const metadata: Metadata = {
   title: 'Kas Keluarga — Sistem Iuran',
@@ -58,12 +59,19 @@ export default function RootLayout({
               background: '#000',
               color: '#fff',
               border: '1px solid #262626',
-              borderRadius: '0',
+              borderRadius: 0,
               fontSize: '0.8125rem',
-              fontWeight: '500',
+              fontWeight: 500,
               letterSpacing: '0.02em',
             },
           }}
+        />
+
+        {/* Midtrans Snap.js - Load once globally */}
+        <Script
+          src="https://app.sandbox.midtrans.com/snap/snap.js"
+          data-client-key={process.env.NEXT_PUBLIC_MIDTRANS_CLIENT_KEY}
+          strategy="afterInteractive"
         />
       </body>
     </html>
