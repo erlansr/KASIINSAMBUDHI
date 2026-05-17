@@ -73,7 +73,7 @@ export default function LaporanPDF({ data, summary, bulan, tahun, status }: Lapo
       <Page size="A4" style={styles.page}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.title}>LAPORAN KAS RT</Text>
+          <Text style={styles.title}>LAPORAN KAS KELUARGA</Text>
           <Text style={styles.subtitle}>Periode: {bulan} {tahun}</Text>
           <Text style={styles.subtitle}>Status: {statusText}</Text>
         </View>
@@ -123,7 +123,7 @@ export default function LaporanPDF({ data, summary, bulan, tahun, status }: Lapo
         {/* Footer */}
         <View style={styles.footer}>
           <Text>Dicetak: {new Date().toLocaleString('id-ID')}</Text>
-          <Text>Sistem Kas RT</Text>
+          <Text>Sistem Kas Keluarga</Text>
         </View>
       </Page>
     </Document>
